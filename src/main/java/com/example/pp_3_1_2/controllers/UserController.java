@@ -1,6 +1,7 @@
 package com.example.pp_3_1_2.controllers;
 
 import com.example.pp_3_1_2.models.User;
+import com.example.pp_3_1_2.service.UserService;
 import com.example.pp_3_1_2.service.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,15 +14,15 @@ import java.util.Optional;
 @Controller
 public class UserController {
 
-    private final UserServiceImpl userServiceImpl;
+    private final UserService userService;
     @Autowired
-    public UserController (UserServiceImpl userServiceImpl) {
-        this.userServiceImpl = userServiceImpl;
+    public UserController (UserService userService) {
+        this.userService = userService;
     }
 
     @GetMapping("/user")
     public String getUsers(Model model) {
-        Iterable<User> users = userServiceImpl.findAll();
+        Iterable<User> users = userService.findAll();
         model.addAttribute("users",users);
         return "user";
     }
@@ -33,20 +34,20 @@ public class UserController {
 
     @PostMapping("/addUser")
     public String addUser(@ModelAttribute("user") User user) {
-        userServiceImpl.save(user);
+        userService.save(user);
         return "redirect:/user";
     }
 
     @GetMapping("/{id}/delete")
     public String deleteUser(@PathVariable(value = "id") long id, Model model) {
-       User user = userServiceImpl.findById(id).orElseThrow();
-        userServiceImpl.delete(user);
+       User user = userService.findById(id).orElseThrow();
+        userService.delete(user);
         return "redirect:/user";
     }
 
     @GetMapping("/{id}/edit")
     public String editUser(@PathVariable(value = "id") long id, Model model) {
-        Optional<User> user = userServiceImpl.findById(id);
+        Optional<User> user = userService.findById(id);
         ArrayList<User> res = new ArrayList<>();
         user.ifPresent(res::add);
         model.addAttribute("user", res);
@@ -55,7 +56,7 @@ public class UserController {
 
     @PostMapping("/{id}/edit")
     public String editUser(@PathVariable(value = "id") long id, @ModelAttribute("user") User user) {
-        userServiceImpl.save(user);
+        userService.save(user);
         return "redirect:/user";
     }
 }
